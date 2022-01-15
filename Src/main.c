@@ -113,13 +113,16 @@ int main(void)
 
 
     for (;;) {
-		while (!is_can_msg_pending(CAN_FIFO0))
-			led_process();
-		status = can_rx(&rx_msg, 3);
-		if (status == HAL_OK) {
-			status = slcan_parse_frame((uint8_t *)&msg_buf, &rx_msg);
-			CDC_Transmit_FS(msg_buf, status);
+		if (is_can_msg_pending(CAN_FIFO0)) {
+			status = can_rx(&rx_msg, 3);
+			if (status == HAL_OK) {
+				status = slcan_parse_frame((uint8_t *)&msg_buf, &rx_msg);
+				CDC_Transmit_FS(msg_buf, status);
+			}
 		}
+
+	    slcan_processbuffer();
+
 		led_process();
     }
 
